@@ -5,6 +5,22 @@
     <meta name="viewport" content="width=device-width">
     <title>iBus</title>
 
+    <style>
+        .loadstop {
+            font-family:"Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 12px;
+            color: #003d2d;
+            margin: 6px;
+            padding: 10px 2px 10px 2px;
+            background-color: #bbe0b3;
+            width: 300px;
+            text-align: center;
+        }
+        .loadstop form {
+            margin: auto;
+        }
+    </style>
+
     <template id="busstop">
         <style>
             .bus-stop {
@@ -65,10 +81,14 @@
         const PARADA_BASE_URL = 'https://api.tmb.cat/v1/transit/parades/';
         const PARADA_PARAMS = '?app_id=4c132798&app_key=a828910cef5a0376607986191db19d14&propertyName=NOM_PARADA';
 
-        const stops = [2, 1103, 1296];
+        const DEFAULT_STOPS = [1387, 1164, 3326];
 
-        function init () {
+        function init (stop) {
+            const urlParams = new URLSearchParams(window.location.search);
+            stop = stop || urlParams.get('stop');
+            const stops = stop ? [stop] : DEFAULT_STOPS
             const content = document.querySelector('#content');
+            content.innerHTML = ''
             for (const stop of stops) {
                 const info = createTemplateElement('#busstop');
                 loadStopName(stop).then(function (name) {
@@ -142,10 +162,22 @@
                 request.send();
             });
         }
+
+        function loadstop() {
+            const stopinput = document.querySelector('#stopinput');
+            init(stopinput.value)
+        }
     </script>
 
 </head>
 <body onload="init()">
-<div id="content"></div>
+    <div class="loadstop">
+        <form onsubmit="loadstop(); return false;">
+            <span>Stop number</span>
+            <input id="stopinput" type="text" minlength="1" />
+            <input type="submit" />
+        </form>
+    </div>
+    <div id="content"></div>
 </body>
 </html>
